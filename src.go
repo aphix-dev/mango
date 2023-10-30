@@ -73,7 +73,7 @@ func Trim[Type any](rawStruct Type, filterType int) Type {
 
 	g := pub.Interface()
 
-	return g.(Type)
+	return *(g.(*Type))
 }
 
 /*
