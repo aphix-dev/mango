@@ -6,7 +6,6 @@
 # Mango
 an extensive mongodb schema validator featuring struct tags
 
--------------------------
 
 ## Installation
 Installing Mango is simple! Simply add it to your project by fetching it from github.
