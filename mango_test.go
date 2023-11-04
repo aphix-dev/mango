@@ -11,7 +11,15 @@ type mockModel struct {
 	UpdateOnly int `access:"update"`
 	PubOnly    int `access:"pub"`
 	PrivOnly   int `access:"priv"`
+
+	PurchaserOnly int `access:"purchaserOnly"`
 }
+
+const PURCHASER_ONLY = 10
+
+var conf MangoConfig = DefaultConfig().Extend(map[int]string{
+	PURCHASER_ONLY: "purchaserOnly",
+})
 
 var have mockModel = mockModel{
 	ID:       "foo",
@@ -39,7 +47,7 @@ func mockEqual(a mockModel, b mockModel) bool {
 }
 
 func TestTrimCreate(t *testing.T) {
-	result := Trim(have, CREATE)
+	result := Trim(have, CREATE, conf)
 
 	want := mockModel{
 		ID:       "",
@@ -61,7 +69,7 @@ func TestTrimCreate(t *testing.T) {
 }
 
 func TestTrimUpdate(t *testing.T) {
-	result := Trim(have, UPDATE)
+	result := Trim(have, UPDATE, conf)
 
 	want := mockModel{
 		ID:       "",
@@ -83,7 +91,7 @@ func TestTrimUpdate(t *testing.T) {
 }
 
 func TestTrimPub(t *testing.T) {
-	result := Trim(have, PUB)
+	result := Trim(have, PUB, conf)
 
 	want := mockModel{
 		ID:       "",
@@ -105,7 +113,7 @@ func TestTrimPub(t *testing.T) {
 }
 
 func TestTrimPriv(t *testing.T) {
-	result := Trim(have, PRIV)
+	result := Trim(have, PRIV, conf)
 
 	want := mockModel{
 		ID:       "",
