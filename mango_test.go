@@ -15,21 +15,22 @@ type mockModel struct {
 	PurchaserOnly int `access:"purchaserOnly"`
 }
 
-const PURCHASER_ONLY = 10
+const PURCHASER_ONLY = iota
 
 var conf MangoConfig = DefaultConfig().Extend(map[int]string{
 	PURCHASER_ONLY: "purchaserOnly",
-})
+}).EnableLogs()
 
 var have mockModel = mockModel{
 	ID:       "foo",
 	Username: "bar",
 	Password: "baz",
 
-	CreateOnly: 1,
-	UpdateOnly: 1,
-	PubOnly:    1,
-	PrivOnly:   1,
+	CreateOnly:    1,
+	UpdateOnly:    1,
+	PubOnly:       1,
+	PrivOnly:      1,
+	PurchaserOnly: 1,
 }
 
 func mockEqual(a mockModel, b mockModel) bool {
@@ -39,7 +40,8 @@ func mockEqual(a mockModel, b mockModel) bool {
 		a.CreateOnly == b.CreateOnly &&
 		a.UpdateOnly == b.UpdateOnly &&
 		a.PubOnly == b.PubOnly &&
-		a.PrivOnly == b.PrivOnly {
+		a.PrivOnly == b.PrivOnly &&
+		a.PurchaserOnly == b.PurchaserOnly {
 		return true
 	}
 
@@ -54,10 +56,11 @@ func TestTrimCreate(t *testing.T) {
 		Username: "bar",
 		Password: "baz",
 
-		CreateOnly: 1,
-		UpdateOnly: 0,
-		PubOnly:    0,
-		PrivOnly:   0,
+		CreateOnly:    1,
+		UpdateOnly:    0,
+		PubOnly:       0,
+		PrivOnly:      0,
+		PurchaserOnly: 0,
 	}
 
 	if mockEqual(result, want) {
@@ -76,10 +79,11 @@ func TestTrimUpdate(t *testing.T) {
 		Username: "bar",
 		Password: "",
 
-		CreateOnly: 0,
-		UpdateOnly: 1,
-		PubOnly:    0,
-		PrivOnly:   0,
+		CreateOnly:    0,
+		UpdateOnly:    1,
+		PubOnly:       0,
+		PrivOnly:      0,
+		PurchaserOnly: 0,
 	}
 
 	if mockEqual(result, want) {
@@ -98,10 +102,11 @@ func TestTrimPub(t *testing.T) {
 		Username: "bar",
 		Password: "",
 
-		CreateOnly: 0,
-		UpdateOnly: 0,
-		PubOnly:    1,
-		PrivOnly:   0,
+		CreateOnly:    0,
+		UpdateOnly:    0,
+		PubOnly:       1,
+		PrivOnly:      0,
+		PurchaserOnly: 0,
 	}
 
 	if mockEqual(result, want) {
@@ -120,10 +125,34 @@ func TestTrimPriv(t *testing.T) {
 		Username: "bar",
 		Password: "baz",
 
-		CreateOnly: 0,
-		UpdateOnly: 0,
-		PubOnly:    0,
-		PrivOnly:   1,
+		CreateOnly:    0,
+		UpdateOnly:    0,
+		PubOnly:       0,
+		PrivOnly:      1,
+		PurchaserOnly: 0,
+	}
+
+	if mockEqual(result, want) {
+		t.Log("success")
+		return
+	}
+
+	t.Error("mock values are not equal")
+}
+
+func TestTrimCustom(t *testing.T) {
+	result := Trim(have, PURCHASER_ONLY, conf)
+
+	want := mockModel{
+		ID:       "",
+		Username: "",
+		Password: "",
+
+		CreateOnly:    0,
+		UpdateOnly:    0,
+		PubOnly:       0,
+		PrivOnly:      0,
+		PurchaserOnly: 1,
 	}
 
 	if mockEqual(result, want) {
